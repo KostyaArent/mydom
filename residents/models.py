@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.core.validators import MaxValueValidator
 
 
@@ -14,6 +14,9 @@ class BaseLocation(models.Model):
 class Region(BaseLocation):
     code = models.IntegerField(unique=True, validators=[MaxValueValidator(999)])
 
+    def __str__(self):
+        return self.title
+
 
 class Location(BaseLocation):
     TYPES = (
@@ -22,6 +25,7 @@ class Location(BaseLocation):
     ('street', 'Улица'),
     )
     type = models.CharField(max_length=300, choices = TYPES)
+
     def __str__(self):
         return self.title
 
@@ -45,21 +49,23 @@ class House(models.Model):
     town = models.ForeignKey(Location, related_name='Город', on_delete=models.CASCADE, limit_choices_to={'type': 'town'})
     street = models.ForeignKey(Location, related_name='Улица', on_delete=models.CASCADE, limit_choices_to={'type': 'street'})
 
+    def __str__(self):
+        return f'{self.region}, {self.town}, {self.street}, {self.number}'
+
+
+class User(AbstractUser):
+    is_personnel = models.BooleanField(default=False)
+    birth_date = models.DateField(null=True, blank=True)
 
 
 class BaseResident(models.Model):
-    """Абстрактная базовая модель собственника.
-    :param itn: ИНН
-    :type itn: CharField
-    """
-    itn = models.CharField(default=0, max_length=20)
+    address = models.ForeignKey(House, models.SET_NULL, null=True)
+    is_confirmed = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
 
-
-
-class IndividualResident(BaseResident):
+class IndividualResident(models.Model):
     """Модель собственника физического лица.
     :param user: Экземпляр класса User
     :type user: ForeignKey
@@ -72,8 +78,7 @@ class IndividualResident(BaseResident):
         return self.user.username
 
 
-
-class EntityResident(BaseResident):
+class EntityResident(models.Model):
     """Модель собственника юридического лица.
     :param title: краткое наименование юр.лица
     :type title: CharField
@@ -86,6 +91,7 @@ class EntityResident(BaseResident):
     """
     title = models.CharField(default=0, max_length=50)
     full_title = models.CharField(default=0, max_length=100)
+    itn = models.CharField(default=0, max_length=20)
     kpp = models.CharField(default=0, max_length=20)
     staff = models.ManyToManyField(User, blank=True)
 
@@ -119,6 +125,9 @@ class Own(models.Model):
     house = models.ForeignKey(House, on_delete=models.CASCADE)
     owners = models.ManyToManyField(BaseResidentRel)
     is_living = models.BooleanField()
+
+    def __str__(self):
+        return f'{self.house}, {self.number}'
 
 
 class Organization(BaseResident):

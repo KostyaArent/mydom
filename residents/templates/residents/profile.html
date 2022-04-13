@@ -1,0 +1,8 @@
+{% extends 'residents/base.html' %}
+
+{% block content %}
+  {% for own in owns %}
+    {{ own }}
+  {% endfor %}
+  {{resident}}
+{% endblock %}

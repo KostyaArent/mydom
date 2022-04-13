@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4a()c-fy!nt94xuryhq=^5#4g--3$pu(vu%3*$56)vmo&_=j$*
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.243', 'localhost', '178.204.121.225']
 
 
 # Application definition
@@ -124,3 +124,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# AbstractUser
+AUTH_USER_MODEL = 'residents.User'
