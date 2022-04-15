@@ -42,7 +42,7 @@
         </div>
         <!-- Spinner End -->
 
-
+{% if request.user.is_authenticated %}
         <!-- Sidebar Start -->
         <div class="sidebar pe-4 pb-3">
             <nav class="navbar bg-light navbar-light">
@@ -60,7 +60,7 @@
                     </div>
                 </div>
                 <div class="navbar-nav w-100">
-                    <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Мои данные</a>
+                    <a href="{% url 'residents:profile' %}" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Мои данные</a>
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Обращения</a>
                         <div class="dropdown-menu bg-transparent border-0">
@@ -70,7 +70,7 @@
                             <a href="element.html" class="dropdown-item">по району</a>
                         </div>
                     </div>
-                    <a href="widget.html" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Мой дом</a>
+                    <a href="{% url 'residents:owns' %}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Моя собственность</a>
                     <a href="form.html" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>Формы обращения</a>
                     <a href="table.html" class="nav-item nav-link"><i class="fa fa-table me-2"></i>Объявления</a>
                     <a href="chart.html" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Charts</a>
@@ -87,10 +87,14 @@
             </nav>
         </div>
         <!-- Sidebar End -->
-
+{% endif %}
 
         <!-- Content Start -->
+        {% if request.user.is_authenticated %}
         <div class="content">
+        {% else %}
+        <div class="content open">
+        {% endif %}
         <!-- Navbar Start -->
             <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
                 <a href="index.html" class="navbar-brand d-flex d-lg-none me-4">

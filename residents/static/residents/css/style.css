@@ -80,7 +80,7 @@
 }
 
 .content {
-    margin-left: 250px;
+    /* margin-left: 250px; */
     min-height: 100vh;
     background: #FFFFFF;
     transition: 0.5s;
@@ -96,7 +96,7 @@
     }
 
     .content {
-        width: calc(100% - 250px);
+        width: 100%;
     }
 
     .content.open {
@@ -274,4 +274,9 @@
 .testimonial-carousel .owl-dot.active {
     background: var(--dark);
     border-color: var(--primary);
+}
+
+/*** Customize ***/
+div.row.g-4 {
+  justify-content: center;
 }
