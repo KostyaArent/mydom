@@ -39,13 +39,15 @@ class CustomAuthWithCodeForm(ModelForm):
             'id': 'floatingInput',
             'class': 'form-control',
             'name': 'username',
-            'placeholder': 'login'})
+            'placeholder': 'login',
+            'readonly':'readonly'})
         self.fields['password'].widget = TextInput(attrs={
             'type': 'password',
             'id': 'floatingPassword',
             'class': 'form-control',
             'name': 'password',
-            'placeholder': 'Password'})
+            'placeholder': 'Password',
+            'readonly':'readonly'})
         self.fields['check_code'].widget = TextInput(attrs={
             'type': 'password',
             'id': 'floatingCode',
