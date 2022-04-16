@@ -18,12 +18,10 @@ def signin(request):
     else:
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
         check_code = request.POST.get('check_code', None)
-        print(f'code in form {check_code}')
     if user is None:
         return render(request, 'residents/signin.html', {'form':CustomAuthForm(), 'error':'Account didn\'t found!'})
     elif check_code:
         code_2fa = business_logic.find_code(user)
-        print(f'2fa code in base {code_2fa}')
         if request.POST['check_code'] == str(code_2fa.code):
             code_status = business_logic.delete_code(user)
             login(request, user)
