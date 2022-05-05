@@ -1,6 +1,7 @@
 from django.contrib import admin
 from .models import (Region, Location, House, Own, IndividualResident,
-    EntityResident, Organization, BaseResidentRel, User, Code2FA)
+    EntityResident, Organization, BaseResidentRel, User, Code2FA,
+    Stage, Appeal)
 
 # Register your models here.
 admin.site.register(Region)
@@ -13,3 +14,5 @@ admin.site.register(Organization)
 admin.site.register(BaseResidentRel)
 admin.site.register(User)
 admin.site.register(Code2FA)
+admin.site.register(Stage)
+admin.site.register(Appeal)

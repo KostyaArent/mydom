@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.views.generic.detail import View, DetailView
+from django.views.generic.list import ListView
 
 from .forms import CustomAuthForm, CustomAuthWithCodeForm
-from .models import BaseResident, Own, EntityResident, IndividualResident, BaseResidentRel, User, Code2FA
+from .models import BaseResident, Own, EntityResident, IndividualResident, BaseResidentRel, User, Code2FA, Appeal
 from . import business_logic
 
 
@@ -12,7 +13,6 @@ def lk(request):
 
 
 def signin(request):
-
     if request.method == 'GET':
         return render(request, 'residents/signin.html', {'form':CustomAuthForm()})
     else:
@@ -38,7 +38,6 @@ def signin(request):
 
 
 class BaseView(View):
-
     def get(self, request):
         if self.request.user.is_personnel:
             resident = get_object_or_404(EntityResident, staff=self.request.user)
@@ -66,3 +65,25 @@ class ProfileDetailView(DetailView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(User, id=self.request.user.id)
+
+
+class AppealListView(ListView):
+    template_name = 'residents/appeal_list.html'
+    context_object_name = 'appeals'
+    model = Appeal
+
+    def get_queryset(self):
+        if self.request.user.is_personnel:
+            resident = get_object_or_404(EntityResident, staff=self.request.user)
+            base_residents = get_object_or_404(BaseResidentRel, entity_resident=resident)
+        elif not self.request.user.is_personnel:
+            resident = get_object_or_404(IndividualResident, user=self.request.user)
+            base_residents = get_object_or_404(BaseResidentRel, individual_resident=resident)
+        queryset = Appeal.objects.filter(owner=base_residents)
+        return queryset
+
+
+class AppealDetailView(DetailView):
+    template_name = 'residents/appeal_detail.html'
+    context_object_name = 'appeal'
+    model = Appeal

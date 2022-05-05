@@ -152,5 +152,38 @@ class Organization(BaseResident):
 
 
 class Code2FA(models.Model):
-    code = models.IntegerField(default=randint(1001, 9999))
-    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
+    code = models.IntegerField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+
+    @classmethod
+    def new_code(self):
+        self.code = randint(1001, 9999)
+        self.save()
+        return self.code
+
+
+class Stage(models.Model):
+    title = models.CharField(unique=True, max_length=50)
+
+    def __str__(self):
+        return self.title
+
+
+class Appeal(models.Model):
+    CATEGORIES = (
+        ('cleaning', 'Уборка'),
+        ('water', 'Водоснабжение'),
+        ('houseside', 'Придомовая территория'),
+        )
+    status = models.ForeignKey(Stage, on_delete=models.CASCADE)
+    category = models.CharField(max_length=300, choices = CATEGORIES)
+    owner = models.ForeignKey(BaseResidentRel, on_delete=models.CASCADE)
+    address = models.ForeignKey(Own, on_delete=models.CASCADE, blank=True, null=True)
+    text = models.TextField()
+    responsible = models.ForeignKey(User, on_delete=models.PROTECT, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    changed_date = models.DateTimeField(blank=True, null=True)
+    closed_date = models.DateTimeField(blank=True, null=True)
+
+    def __str__(self):
+        return str(self.pk)

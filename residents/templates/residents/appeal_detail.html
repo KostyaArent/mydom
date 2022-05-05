@@ -1,0 +1,44 @@
+{% extends 'residents/base.html' %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+<!-- User's own Start -->
+
+      <div class="col-sm-12 col-xl-6">
+        <div class="bg-light rounded h-100 p-4">
+
+           <h6 class="mb-4">Appeal №{{ appeal.id }}</h6>
+           <hr>
+           <dl class="row mb-0">
+               <dt class="col-sm-4">Address</dt>
+               <dd class="col-sm-8">{{ appeal.address }}</dd>
+
+               <dt class="col-sm-4">Status:</dt>
+               <dd class="col-sm-8">{{ appeal.status }}</dd>
+
+               <dt class="col-sm-4">Category:</dt>
+               <dd class="col-sm-8">{{ appeal.get_category_display }}</dd>
+
+               <dt class="col-sm-4">Text:</dt>
+               <dd class="col-sm-8">{{ appeal.text }}</dd>
+
+               <dt class="col-sm-4">Owner:</dt>
+               <dd class="col-sm-8">{{ appeal.owner }}</dd>
+
+               <dt class="col-sm-4">Responsible:</dt>
+               <dd class="col-sm-8">{{ appeal.responsible }}</dd>
+
+               <dt class="col-sm-4">Created date:</dt>
+               <dd class="col-sm-8">{{ appeal.created_date }}</dd>
+
+               <dt class="col-sm-4">Edited date:</dt>
+               <dd class="col-sm-8">{{ appeal.changed_date }}</dd>
+           </dl>
+           <a href="{% url 'residents:appeal_detail' appeal.id %}" class="btn btn-outline-primary w-100 m-2" type="button">Edit</a>
+       </div>
+    </div>
+  </div>
+</div>
+<!-- User's own End -->
+{% endblock %}

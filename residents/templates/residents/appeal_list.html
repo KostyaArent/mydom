@@ -1,0 +1,47 @@
+
+{% extends 'residents/base.html' %}
+
+{% block content %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+  <div class="col-12">
+     <div class="bg-light rounded h-100 p-4">
+         <h6 class="mb-4">Appeals</h6>
+         <div class="table-responsive">
+             <table class="table">
+                 <thead>
+                     <tr>
+                         <th scope="col">№</th>
+                         <th scope="col">Category</th>
+                         <th scope="col">Status</th>
+                         <th scope="col">Text</th>
+                         <th scope="col">Responsible</th>
+                         <th scope="col">Owner</th>
+                         <th scope="col">Created date</th>
+                         <th scope="col">Edited date</th>
+
+
+                     </tr>
+                 </thead>
+                 <tbody>
+                   {% for appeal in appeals %}
+                     <tr>
+                         <th scope="row"><a href="{% url 'residents:appeal_detail' appeal.id %}">{{ appeal.id }}</a></th>
+                         <td>{{ appeal.get_category_display }}</td>
+                         <td>{{ appeal.status }}</td>
+                         <td>{{ appeal.text| truncatewords:3 }}</td>
+                         <td>{{ appeal.responsible }}</td>
+                         <td>{{ appeal.owner }}</td>
+                         <td>{{ appeal.created_date }}</td>
+                         <td>{{ appeal.changed_date }}</td>
+                     </tr>
+                    {% endfor %}
+                 </tbody>
+             </table>
+         </div>
+     </div>
+ </div>
+</div>
+</div>
+<!-- User's own End -->
+{% endblock %}
