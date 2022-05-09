@@ -5,7 +5,7 @@ from django.views.generic.list import ListView
 
 from .forms import CustomAuthForm, CustomAuthWithCodeForm
 from .models import BaseResident, Own, EntityResident, IndividualResident, BaseResidentRel, User, Code2FA, Appeal
-from . import business_logic
+from . import code_2fa_auth
 
 
 def lk(request):
@@ -21,17 +21,17 @@ def signin(request):
     if user is None:
         return render(request, 'residents/signin.html', {'form':CustomAuthForm(), 'error':'Account didn\'t found!'})
     elif check_code:
-        code_2fa = business_logic.find_code(user)
+        code_2fa = code_2fa_auth.find_code(user)
         if request.POST['check_code'] == str(code_2fa.code):
-            code_status = business_logic.delete_code(user)
+            code_status = code_2fa_auth.delete_code(user)
             login(request, user)
             return redirect('residents:lk')
         else:
             return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST), 'error':'Wrong code!'})
     else:
         #SEND THE CODE
-        code_status = business_logic.create_code(user)
-        code_status = business_logic.send_code(user)
+        code_status = code_2fa_auth.create_code(user)
+        code_status = code_2fa_auth.send_code(user)
         return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST)})
 
 

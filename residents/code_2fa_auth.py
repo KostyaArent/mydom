@@ -3,9 +3,13 @@ from random import randint
 
 
 def create_code(user):
-    code_2fa, created = Code2FA.objects.get_or_create(user=user)
-    code_2fa.new_code()
-    print(code_2fa.code)
+    code_2fa, created = Code2FA.objects.get_or_create(
+        user=user,
+        defaults={'code': randint(1001, 9999)}
+        )
+    if not created:
+        code_2fa.code = randint(1001, 9999)
+        code_2fa.save()
     return 'code_saved'
 
 
@@ -22,4 +26,5 @@ def delete_code(user):
 
 def send_code(user):
     code_2fa = find_code(user)
+    print(code_2fa.code)
     return 'code_sended'

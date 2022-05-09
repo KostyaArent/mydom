@@ -152,14 +152,11 @@ class Organization(BaseResident):
 
 
 class Code2FA(models.Model):
-    code = models.IntegerField()
+    code = models.IntegerField(default=1234)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    @classmethod
-    def new_code(self):
-        self.code = randint(1001, 9999)
-        self.save()
-        return self.code
+    def __str__(self):
+        return self.user.username
 
 
 class Stage(models.Model):
