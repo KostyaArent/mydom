@@ -1,7 +1,10 @@
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import TextInput, IntegerField, ModelForm, Select, FileInput
+from django.forms import (
+    TextInput, IntegerField, ModelForm, Select, ClearableFileInput,
+    Textarea, ModelChoiceField, FileField
+    )
 
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory, BaseInlineFormSet
 
 from .models import User, Appeal, Own, AppealPicture
 
@@ -74,33 +77,44 @@ class AppealForm(ModelForm):
             },
             choices=Appeal.CATEGORIES
             )
-        self.fields['address'].widget = Select(
+        self.fields['address'] = ModelChoiceField(
+            queryset = addresses,
+            widget = Select(
+                attrs={
+                    'class': 'form-select mb-3',
+                }
+                )
+        )
+        self.fields['text'].widget = Textarea(
             attrs={
-                'class': 'form-select mb-3',
-            },
-            choices=[(c.id, f'{c.house}, {c.number}') for c in addresses]
-            )
-        self.fields['text'].widget = TextInput(attrs={
-            'class': 'form-control',
+                'id': "floatingTextarea",
+                'style': "height: 150px;",
+                'class': 'form-control',
             })
 
 
-class AppealImageForm(ModelForm):
+class AppealImageForm(BaseInlineFormSet):
 
     class Meta:
         model = AppealPicture
         fields = ['image']
 
-    def __init__(self, *args, **kwargs):
-        super(AppealImageForm, self).__init__(*args, **kwargs)
-        self.fields['image'].widget = FileInput(attrs={
-            'type': 'file',
-            'id': 'formFile',
-            'placeholder': 'Photo',
-            'class': 'form-control'
-            })
+    # def __init__(self, *args, **kwargs):
+    #     super(AppealImageForm, self).__init__(*args, **kwargs)
+    #     self.fields['image'] = FileField(widget = ClearableFileInput(attrs={
+    #         'multiple': True,
+    #         # 'type': 'file',
+    #         # 'id': 'formFile',
+    #         'placeholder': 'Upload photos',
+    #         # 'class': 'form-control'
+    #         }))
 
 ImageFormset = inlineformset_factory(
-    Appeal, AppealPicture, form = AppealImageForm,
-    fields='__all__', extra=3, can_delete=False
-    )
+    Appeal, AppealPicture, formset = AppealImageForm,
+    fields='__all__', extra=2, max_num=2, can_delete=False,
+    widgets={
+        'image': ClearableFileInput(attrs={
+                                        'label': 'Upload photos',
+                                        'class': 'form-control form-control-sm'
+                                    }
+    )})

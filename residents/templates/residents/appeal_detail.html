@@ -34,8 +34,18 @@
 
                <dt class="col-sm-4">Edited date:</dt>
                <dd class="col-sm-8">{{ appeal.changed_date }}</dd>
+
+               <dt class="row-sm-4">Photos:</dt>
+
+               {% for picture in appeal_picrtures %}
+               <img src="{{ picture.image.url }}" style="display: inline; width:50%;" alt="No image">
+               {% endfor %}
+               <dd></dd>
+               <dt class="col-sm-4">Supporters:</dt>
+               <dd class="col-sm-8">{{ appeal.supporters }}</dd>
            </dl>
-           <a href="{% url 'residents:appeal_detail' appeal.id %}" class="btn btn-outline-primary w-100 m-2" type="button">Edit</a>
+           <hr>
+           <a href="{% url 'residents:appeal_detail' appeal.id %}" class="btn btn-outline-primary w-100 m-2" type="button">Поддержать</a>
        </div>
     </div>
   </div>

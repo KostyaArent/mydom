@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.views.generic.detail import View, DetailView
 from django.views.generic.edit import CreateView
@@ -11,7 +12,7 @@ from .forms import (
 from .models import (
     BaseResident, Own, EntityResident,
     IndividualResident, BaseResidentRel,
-    User, Code2FA, Appeal
+    User, Code2FA, Appeal, Stage, AppealPicture
     )
 from . import code_2fa_auth
 
@@ -95,6 +96,11 @@ class AppealDetailView(DetailView):
     context_object_name = 'appeal'
     model = Appeal
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['appeal_picrtures'] = AppealPicture.objects.filter(appeal=self.object)
+        return context
+
 
 class AppealCreateView(CreateView):
     template_name = 'residents/appeal_form.html'
@@ -112,10 +118,21 @@ class AppealCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         self.object = None
         form = AppealForm(self.request.POST)
+        resident = get_object_or_404(IndividualResident, user=self.request.user)
+        base_residents = get_object_or_404(BaseResidentRel, individual_resident=resident)
+        form.instance.owner = base_residents
+        form.instance.status = Stage.objects.get(id=1)
+        form.instance.responsible = User.objects.filter(is_staff=True).first()
+        files = request.FILES.getlist('image')
+        print('Request:')
+        print(self.request.POST)
+        print('Files:')
+        print(files)
         if form.is_valid():
             self.object = form.save(commit=False)
             image_formset = ImageFormset(self.request.POST, self.request.FILES)
             image_formset.instance = self.object
+            print('form is ok')
             if image_formset.is_valid():
                 self.object.save()
                 image_formset.save()
