@@ -1,6 +1,9 @@
 from django.contrib.auth.forms import AuthenticationForm
-from django.forms import TextInput, IntegerField, ModelForm
-from .models import User
+from django.forms import TextInput, IntegerField, ModelForm, Select, FileInput
+
+from django.forms.models import inlineformset_factory
+
+from .models import User, Appeal, Own, AppealPicture
 
 
 class CustomAuthForm(AuthenticationForm):
@@ -54,3 +57,50 @@ class CustomAuthWithCodeForm(ModelForm):
             'class': 'form-control',
             'name': 'check_code',
             'placeholder': 'Code'})
+
+
+class AppealForm(ModelForm):
+
+    class Meta:
+        model = Appeal
+        fields = ['category', 'address', 'text']
+
+    def __init__(self, *args, **kwargs):
+        super(AppealForm, self).__init__(*args, **kwargs)
+        addresses = Own.objects.all()
+        self.fields['category'].widget = Select(
+            attrs={
+                'class': 'form-select mb-3',
+            },
+            choices=Appeal.CATEGORIES
+            )
+        self.fields['address'].widget = Select(
+            attrs={
+                'class': 'form-select mb-3',
+            },
+            choices=[(c.id, f'{c.house}, {c.number}') for c in addresses]
+            )
+        self.fields['text'].widget = TextInput(attrs={
+            'class': 'form-control',
+            })
+
+
+class AppealImageForm(ModelForm):
+
+    class Meta:
+        model = AppealPicture
+        fields = ['image']
+
+    def __init__(self, *args, **kwargs):
+        super(AppealImageForm, self).__init__(*args, **kwargs)
+        self.fields['image'].widget = FileInput(attrs={
+            'type': 'file',
+            'id': 'formFile',
+            'placeholder': 'Photo',
+            'class': 'form-control'
+            })
+
+ImageFormset = inlineformset_factory(
+    Appeal, AppealPicture, form = AppealImageForm,
+    fields='__all__', extra=3, can_delete=False
+    )

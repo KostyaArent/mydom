@@ -1,10 +1,18 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.views.generic.detail import View, DetailView
+from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 
-from .forms import CustomAuthForm, CustomAuthWithCodeForm
-from .models import BaseResident, Own, EntityResident, IndividualResident, BaseResidentRel, User, Code2FA, Appeal
+from .forms import (
+    CustomAuthForm, CustomAuthWithCodeForm,
+    AppealForm, AppealImageForm, ImageFormset
+    )
+from .models import (
+    BaseResident, Own, EntityResident,
+    IndividualResident, BaseResidentRel,
+    User, Code2FA, Appeal
+    )
 from . import code_2fa_auth
 
 
@@ -86,3 +94,30 @@ class AppealDetailView(DetailView):
     template_name = 'residents/appeal_detail.html'
     context_object_name = 'appeal'
     model = Appeal
+
+
+class AppealCreateView(CreateView):
+    template_name = 'residents/appeal_form.html'
+    model = Appeal
+    form_class = AppealForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'form': AppealForm(),
+            'image_formset': ImageFormset(instance=self.object)
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = None
+        form = AppealForm(self.request.POST)
+        if form.is_valid():
+            self.object = form.save(commit=False)
+            image_formset = ImageFormset(self.request.POST, self.request.FILES)
+            image_formset.instance = self.object
+            if image_formset.is_valid():
+                self.object.save()
+                image_formset.save()
+                return HttpResponseRedirect(self.get_success_url())
+        return self.render_to_response(self.get_context_data(form=form, image_formset=image_formset))

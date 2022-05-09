@@ -184,3 +184,11 @@ class Appeal(models.Model):
 
     def __str__(self):
         return str(self.pk)
+
+
+class AppealPicture(models.Model):
+    image = models.ImageField(upload_to='media/appeal/')
+    appeal = models.ForeignKey(Appeal, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.id)
