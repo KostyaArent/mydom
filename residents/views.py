@@ -12,29 +12,28 @@ def lk(request):
     return render(request, 'residents/index.html')
 
 
-def signin(request):
-    if request.method == 'GET':
+class SignInView(View):
+    def get(self, request):
         return render(request, 'residents/signin.html', {'form':CustomAuthForm()})
-    else:
+
+    def post(self, request):
         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
         check_code = request.POST.get('check_code', None)
-    if user is None:
-        return render(request, 'residents/signin.html', {'form':CustomAuthForm(), 'error':'Account didn\'t found!'})
-    elif check_code:
-        code_2fa = code_2fa_auth.find_code(user)
-        if request.POST['check_code'] == str(code_2fa.code):
-            code_status = code_2fa_auth.delete_code(user)
-            login(request, user)
-            return redirect('residents:lk')
+        if user is None:
+            return render(request, 'residents/signin.html', {'form':CustomAuthForm(), 'error':'Account didn\'t found!'})
+        elif check_code:
+            code_2fa = code_2fa_auth.find_code(user)
+            if request.POST['check_code'] == str(code_2fa.code):
+                code_status = code_2fa_auth.delete_code(user)
+                login(request, user)
+                return redirect('residents:lk')
+            else:
+                return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST), 'error':'Wrong code!'})
         else:
-            return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST), 'error':'Wrong code!'})
-    else:
-        #SEND THE CODE
-        code_status = code_2fa_auth.create_code(user)
-        code_status = code_2fa_auth.send_code(user)
-        return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST)})
-
-
+            #CREATE & SEND THE CODE
+            code_status = code_2fa_auth.create_code(user)
+            code_status = code_2fa_auth.send_code(user)
+            return render(request, 'residents/signin.html', {'form':CustomAuthWithCodeForm(request.POST)})
 
 
 class BaseView(View):
