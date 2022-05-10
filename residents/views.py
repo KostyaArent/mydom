@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login
 from django.views.generic.detail import View, DetailView
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
+from django.views.generic import TemplateView
 
 from .forms import (
     CustomAuthForm, CustomAuthWithCodeForm,
@@ -17,8 +18,28 @@ from .models import (
 from . import code_2fa_auth
 
 
-def lk(request):
-    return render(request, 'residents/index.html')
+class PersonalCabinetIndex(TemplateView):
+    template_name = 'residents/index.html'
+
+    def get(self, request):
+        # print(self.get_context_data()['appeals'].reverse()[:5])
+        return render(request, 'residents/index.html', {'context': self.get_context_data()})
+
+    def get_object(self, queryset=None):
+        if self.request.user.is_personnel:
+            resident = get_object_or_404(EntityResident, staff=self.request.user)
+            residents_record = get_object_or_404(BaseResidentRel, entity_resident=resident)
+        elif not self.request.user.is_personnel:
+            resident = get_object_or_404(IndividualResident, user=self.request.user)
+            residents_record = get_object_or_404(BaseResidentRel, individual_resident=resident)
+        else:
+            residents_record = None
+        return residents_record
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['appeals'] = Appeal.objects.filter(owner=self.get_object()).order_by('-pk')[:6]
+        return context
 
 
 class SignInView(View):

@@ -8,7 +8,7 @@
      <div class="bg-light rounded h-100 p-4">
          <h6 class="mb-4">Appeals</h6>
          <div class="table-responsive">
-             <table class="table">
+             <table class="table table-hover">
                  <thead>
                      <tr>
                          <th scope="col">№</th>
@@ -19,14 +19,12 @@
                          <th scope="col">Owner</th>
                          <th scope="col">Created date</th>
                          <th scope="col">Edited date</th>
-
-
                      </tr>
                  </thead>
                  <tbody>
                    {% for appeal in appeals %}
-                     <tr>
-                         <th scope="row"><a href="{% url 'residents:appeal_detail' appeal.id %}">{{ appeal.id }}</a></th>
+                     <tr data-href="{% url 'residents:appeal_detail' appeal.id %}">
+                         <th scope="row">{{ appeal.id }}</th>
                          <td>{{ appeal.get_category_display }}</td>
                          <td>{{ appeal.status }}</td>
                          <td>{{ appeal.text| truncatewords:3 }}</td>
